@@ -48,13 +48,49 @@ Docs: add setup guide for new developers
 ## Code review checklist
 
 - [ ] Kód kompiluje bez warningů
-- [ ] Všechny nové funkce jsou otestované
+- [ ] **Všechny nové funkce mají unit testy**
+- [ ] **Testy procházejí lokálně (`./run_tests.sh`)**
+- [ ] **Code coverage je ≥70%**
 - [ ] Dokumentace je aktualizovaná
 - [ ] UI je responzivní a funguje v dark mode
 - [ ] Žádné hardcoded API klíče nebo citlivé údaje
 - [ ] Commit messages jsou jasné a popisné
+- [ ] SwiftLint warnings jsou opravené
 
 ## Testing
+
+### Unit Tests
+
+Před commitem spusťte testy:
+
+```bash
+cd LivesportClaude
+./run_tests.sh
+```
+
+**Požadavky:**
+- ✅ Všechny testy musí projít
+- ✅ Code coverage ≥70%
+- ✅ Žádné compiler warnings
+
+### Psaní testů
+
+Pro nové funkce vytvořte unit testy:
+
+```swift
+func testNewFeature() {
+    // Arrange - připravte test data
+    let model = MyModel()
+
+    // Act - zavolejte testovanou funkci
+    let result = model.doSomething()
+
+    // Assert - ověřte výsledek
+    XCTAssertEqual(result, expectedValue)
+}
+```
+
+### Manuální testování
 
 Před commitem otestujte:
 
@@ -75,6 +111,16 @@ Před commitem otestujte:
    - Light mode
    - Různá rozlišení okna
    - Sidebar toggle
+
+### CI/CD Pipeline
+
+GitHub Actions automaticky spustí:
+- Unit testy
+- Build verification
+- SwiftLint
+- Coverage check
+
+Pull requesty musí projít všemi checks.
 
 ## Bezpečnost
 

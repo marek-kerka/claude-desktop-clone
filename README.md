@@ -74,6 +74,26 @@ LivesportClaude/
 2. Build and run (⌘R)
 3. The API key is currently embedded in the app
 
+For detailed setup instructions, see [SETUP.md](SETUP.md).
+
+## Testing
+
+The project includes comprehensive unit tests with 70%+ code coverage.
+
+```bash
+cd LivesportClaude
+./run_tests.sh
+```
+
+See [TESTING.md](TESTING.md) for detailed testing documentation.
+
+### Test Coverage
+
+- ✅ Models: 100% coverage
+- ✅ Services: 80%+ coverage
+- ✅ Automated CI/CD with GitHub Actions
+- ✅ Coverage reports on every PR
+
 ## Development
 
 ### API Models

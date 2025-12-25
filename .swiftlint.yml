@@ -1,0 +1,79 @@
+# SwiftLint Configuration for Livesport Claude
+
+# Disable rules
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - force_cast
+  - force_try
+
+# Opt-in rules
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - closure_spacing
+  - redundant_nil_coalescing
+  - private_outlet
+  - nimble_operator
+  - attributes
+  - operator_usage_whitespace
+  - closure_end_indentation
+  - first_where
+  - object_literal
+  - number_separator
+  - prohibited_super_call
+  - fatal_error_message
+
+# Excluded paths
+excluded:
+  - Pods
+  - build
+  - DerivedData
+  - .build
+  - LivesportClaude/LivesportClaudeTests
+
+# File length
+file_length:
+  warning: 500
+  error: 1000
+
+# Function body length
+function_body_length:
+  warning: 50
+  error: 100
+
+# Type body length
+type_body_length:
+  warning: 300
+  error: 500
+
+# Cyclomatic complexity
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+
+# Nesting
+nesting:
+  type_level:
+    warning: 2
+  statement_level:
+    warning: 5
+
+# Identifier name
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 50
+  excluded:
+    - id
+    - x
+    - y
+
+# Custom rules
+custom_rules:
+  no_print:
+    name: "No Print Statements"
+    regex: "print\\("
+    message: "Use proper logging instead of print()"
+    severity: warning

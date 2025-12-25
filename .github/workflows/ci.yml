@@ -1,0 +1,164 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop, 'claude/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_15.0.app/Contents/Developer
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: macos-13
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.0.app/Contents/Developer
+
+    - name: Show Xcode version
+      run: xcodebuild -version
+
+    - name: Show available schemes
+      run: xcodebuild -list -project LivesportClaude/LivesportClaude.xcodeproj || true
+
+    - name: Clean build folder
+      run: |
+        cd LivesportClaude
+        xcodebuild clean -project LivesportClaude.xcodeproj -scheme LivesportClaude || true
+
+    - name: Build for testing
+      run: |
+        cd LivesportClaude
+        xcodebuild build-for-testing \
+          -project LivesportClaude.xcodeproj \
+          -scheme LivesportClaude \
+          -destination 'platform=macOS' \
+          -enableCodeCoverage YES \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Run tests with coverage
+      run: |
+        cd LivesportClaude
+        xcodebuild test-without-building \
+          -project LivesportClaude.xcodeproj \
+          -scheme LivesportClaude \
+          -destination 'platform=macOS' \
+          -enableCodeCoverage YES \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO \
+          -resultBundlePath TestResults
+
+    - name: Generate coverage report
+      run: |
+        cd LivesportClaude
+        xcrun xccov view --report --json TestResults.xcresult > coverage.json
+        xcrun xccov view --report TestResults.xcresult > coverage.txt
+
+    - name: Display coverage summary
+      run: |
+        cd LivesportClaude
+        echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat coverage.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+    - name: Parse coverage percentage
+      id: coverage
+      run: |
+        cd LivesportClaude
+        COVERAGE=$(xcrun xccov view --report TestResults.xcresult | grep -E "^\s*LivesportClaude" | awk '{print $2}' | sed 's/%//')
+        echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "Coverage: $COVERAGE%"
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: |
+          LivesportClaude/coverage.json
+          LivesportClaude/coverage.txt
+          LivesportClaude/TestResults.xcresult
+
+    - name: Comment coverage on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const coverage = fs.readFileSync('LivesportClaude/coverage.txt', 'utf8');
+
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 📊 Test Coverage Report\n\n\`\`\`\n${coverage}\n\`\`\``
+          });
+
+    - name: Check coverage threshold
+      run: |
+        cd LivesportClaude
+        COVERAGE=$(xcrun xccov view --report TestResults.xcresult | grep -E "^\s*LivesportClaude" | awk '{print $2}' | sed 's/%//')
+        echo "Current coverage: $COVERAGE%"
+
+        THRESHOLD=70
+        if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+          echo "❌ Coverage $COVERAGE% is below threshold $THRESHOLD%"
+          exit 1
+        else
+          echo "✅ Coverage $COVERAGE% meets threshold $THRESHOLD%"
+        fi
+
+  build:
+    name: Build App
+    runs-on: macos-13
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.0.app/Contents/Developer
+
+    - name: Build Release
+      run: |
+        cd LivesportClaude
+        xcodebuild build \
+          -project LivesportClaude.xcodeproj \
+          -scheme LivesportClaude \
+          -configuration Release \
+          -destination 'platform=macOS' \
+          CODE_SIGN_IDENTITY="" \
+          CODE_SIGNING_REQUIRED=NO \
+          CODE_SIGNING_ALLOWED=NO
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: LivesportClaude/build/
+
+  lint:
+    name: SwiftLint
+    runs-on: macos-13
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install SwiftLint
+      run: brew install swiftlint
+
+    - name: Run SwiftLint
+      run: |
+        cd LivesportClaude/LivesportClaude
+        swiftlint lint --reporter github-actions-logging || true
