@@ -10,22 +10,24 @@ struct ChatView: View {
     @Binding var conversation: Conversation
     @StateObject private var apiClient: ClaudeAPIClient
     @ObservedObject var storage: ConversationStorage
+    @ObservedObject var promptStorage: SystemPromptStorage
 
     @State private var inputText = ""
     @State private var isStreaming = false
     @State private var streamingResponse = ""
     @State private var selectedImages: [ImageAttachment] = []
 
-    init(conversation: Binding<Conversation>, storage: ConversationStorage) {
+    init(conversation: Binding<Conversation>, storage: ConversationStorage, promptStorage: SystemPromptStorage) {
         self._conversation = conversation
         self.storage = storage
+        self.promptStorage = promptStorage
         self._apiClient = StateObject(wrappedValue: ClaudeAPIClient(apiKey: AppConfiguration.claudeAPIKey))
     }
 
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            ChatHeaderView(conversation: $conversation)
+            ChatHeaderView(conversation: $conversation, storage: storage)
 
             Divider()
 
@@ -121,10 +123,11 @@ struct ChatView: View {
             streamingResponse = ""
 
             do {
+                let systemPrompt = promptStorage.getSelectedPrompt()?.prompt ?? AppConfiguration.defaultSystemPrompt
                 let response = try await apiClient.sendMessage(
                     messages: conversation.messages,
                     model: conversation.model,
-                    systemPrompt: AppConfiguration.defaultSystemPrompt
+                    systemPrompt: systemPrompt
                 ) { chunk in
                     streamingResponse += chunk
                 }
@@ -157,6 +160,7 @@ struct ChatView: View {
 
 struct ChatHeaderView: View {
     @Binding var conversation: Conversation
+    @ObservedObject var storage: ConversationStorage
 
     var body: some View {
         HStack {
@@ -164,6 +168,9 @@ struct ChatHeaderView: View {
                 TextField("Conversation Title", text: $conversation.title)
                     .textFieldStyle(.plain)
                     .font(.headline)
+                    .onChange(of: conversation.title) { _ in
+                        storage.updateConversation(conversation)
+                    }
 
                 Text(conversation.model.displayName)
                     .font(.caption)
@@ -172,7 +179,20 @@ struct ChatHeaderView: View {
 
             Spacer()
 
-            // Model selector could go here
+            // Export menu
+            Menu {
+                Button(action: { ExportService.saveMarkdownFile(conversation: conversation) }) {
+                    Label("Export as Markdown", systemImage: "doc.text")
+                }
+
+                Button(action: { ExportService.exportToPDF(conversation: conversation) }) {
+                    Label("Export as PDF", systemImage: "doc.richtext")
+                }
+            } label: {
+                Image(systemName: "square.and.arrow.up")
+                    .font(.system(size: 16))
+            }
+            .menuStyle(.borderlessButton)
         }
         .padding()
     }

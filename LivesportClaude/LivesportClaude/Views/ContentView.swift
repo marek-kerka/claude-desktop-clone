@@ -7,8 +7,12 @@ import SwiftUI
 
 struct ContentView: View {
     @StateObject private var storage = ConversationStorage()
+    @StateObject private var promptStorage = SystemPromptStorage()
+    @StateObject private var searchService = SearchService()
+
     @State private var selectedConversation: Conversation?
     @State private var showingSettings = false
+    @State private var showingSearch = false
 
     var body: some View {
         NavigationSplitView {
@@ -31,7 +35,8 @@ struct ContentView: View {
                let index = storage.conversations.firstIndex(where: { $0.id == conversation.id }) {
                 ChatView(
                     conversation: $storage.conversations[index],
-                    storage: storage
+                    storage: storage,
+                    promptStorage: promptStorage
                 )
                 .id(conversation.id)
             } else {
@@ -41,13 +46,28 @@ struct ContentView: View {
         .navigationTitle(AppConfiguration.appName)
         .toolbar {
             ToolbarItem(placement: .automatic) {
+                Button(action: { showingSearch = true }) {
+                    Image(systemName: "magnifyingglass")
+                }
+                .help("Search conversations")
+            }
+
+            ToolbarItem(placement: .automatic) {
                 Button(action: { showingSettings = true }) {
                     Image(systemName: "gear")
                 }
+                .help("Settings")
             }
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView(storage: storage)
+            SettingsView(storage: storage, promptStorage: promptStorage)
+        }
+        .sheet(isPresented: $showingSearch) {
+            SearchView(
+                searchService: searchService,
+                storage: storage,
+                selectedConversation: $selectedConversation
+            )
         }
     }
 

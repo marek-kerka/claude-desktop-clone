@@ -7,10 +7,44 @@ import SwiftUI
 
 struct SettingsView: View {
     @AppStorage("selectedModel") private var selectedModel: String = ClaudeModel.sonnet.rawValue
-    @AppStorage("systemPrompt") private var systemPrompt: String = AppConfiguration.defaultSystemPrompt
     @ObservedObject var storage: ConversationStorage
+    @ObservedObject var promptStorage: SystemPromptStorage
 
     @State private var showingClearConfirmation = false
+    @State private var selectedTab = 0
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            GeneralSettingsView(
+                selectedModel: $selectedModel,
+                storage: storage,
+                showingClearConfirmation: $showingClearConfirmation
+            )
+            .tabItem {
+                Label("General", systemImage: "gearshape")
+            }
+            .tag(0)
+
+            SystemPromptsView(promptStorage: promptStorage)
+                .tabItem {
+                    Label("System Prompts", systemImage: "text.bubble")
+                }
+                .tag(1)
+
+            AboutView()
+                .tabItem {
+                    Label("About", systemImage: "info.circle")
+                }
+                .tag(2)
+        }
+        .frame(width: 700, height: 600)
+    }
+}
+
+struct GeneralSettingsView: View {
+    @Binding var selectedModel: String
+    @ObservedObject var storage: ConversationStorage
+    @Binding var showingClearConfirmation: Bool
 
     var body: some View {
         Form {
@@ -48,16 +82,10 @@ struct SettingsView: View {
                     }
                 }
                 .pickerStyle(.radioGroup)
-            }
 
-            Section("System Prompt") {
-                TextEditor(text: $systemPrompt)
-                    .frame(minHeight: 100)
-                    .font(.system(.body, design: .monospaced))
-
-                Button("Reset to Default") {
-                    systemPrompt = AppConfiguration.defaultSystemPrompt
-                }
+                Text("This sets the default model for new conversations")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
 
             Section("Data") {
@@ -78,15 +106,8 @@ struct SettingsView: View {
                     .disabled(storage.conversations.isEmpty)
                 }
             }
-
-            Section("About") {
-                LabeledContent("App Name", value: AppConfiguration.appName)
-                LabeledContent("Version", value: "1.0.0")
-                LabeledContent("Built for", value: "Livesport")
-            }
         }
         .formStyle(.grouped)
-        .frame(width: 500, height: 600)
         .alert("Clear All Conversations?", isPresented: $showingClearConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Clear All", role: .destructive) {
@@ -95,5 +116,65 @@ struct SettingsView: View {
         } message: {
             Text("This will permanently delete all conversations. This action cannot be undone.")
         }
+    }
+}
+
+struct AboutView: View {
+    var body: some View {
+        VStack(spacing: 24) {
+            Image(systemName: "bubble.left.and.bubble.right.fill")
+                .font(.system(size: 64))
+                .foregroundColor(.accentColor)
+
+            VStack(spacing: 8) {
+                Text(AppConfiguration.appName)
+                    .font(.title)
+                    .fontWeight(.semibold)
+
+                Text("Version 1.0.0")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+
+            Divider()
+                .padding(.horizontal, 100)
+
+            VStack(spacing: 16) {
+                InfoRow(title: "Built for", value: "Livesport")
+                InfoRow(title: "Platform", value: "macOS 13.0+")
+                InfoRow(title: "Framework", value: "SwiftUI")
+                InfoRow(title: "AI Provider", value: "Anthropic Claude")
+            }
+
+            Spacer()
+
+            VStack(spacing: 4) {
+                Text("© 2024 Livesport s.r.o.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Text("For internal use only")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+struct InfoRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .foregroundColor(.secondary)
+            Spacer()
+            Text(value)
+                .fontWeight(.medium)
+        }
+        .padding(.horizontal, 100)
     }
 }

@@ -29,21 +29,23 @@ struct MessageBubbleView: View {
                 ForEach(Array(message.content.enumerated()), id: \.offset) { _, block in
                     switch block {
                     case .text(let text):
-                        Text(text)
-                            .textSelection(.enabled)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                message.role == .user
-                                    ? Color.accentColor
-                                    : Color(nsColor: .controlBackgroundColor)
-                            )
-                            .foregroundColor(
-                                message.role == .user
-                                    ? .white
-                                    : .primary
-                            )
-                            .cornerRadius(12)
+                        if message.role == .assistant {
+                            // Use syntax highlighting for assistant messages
+                            MessageContentView(text: text)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color(nsColor: .controlBackgroundColor))
+                                .cornerRadius(12)
+                        } else {
+                            // Simple text for user messages
+                            Text(text)
+                                .textSelection(.enabled)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(Color.accentColor)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
 
                     case .image(let imageContent):
                         if let nsImage = NSImage(data: imageContent.data) {

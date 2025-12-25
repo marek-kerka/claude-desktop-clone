@@ -4,11 +4,27 @@ Native macOS application for Livesport employees to interact with Claude AI usin
 
 ## Features
 
-- 💬 Chat with Claude (Sonnet 4.5 & Opus 4.5)
-- 📝 Conversation management (multiple chats, history)
-- 📎 File attachments support
-- 🌓 Dark/Light mode
-- 💾 Local conversation persistence
+### Core Functionality
+- 💬 **Chat with Claude** - Sonnet 4.5 & Opus 4.5 models
+- 📝 **Conversation Management** - Multiple chats with persistent history
+- 📎 **File Attachments** - Support for images (PNG, JPEG, GIF, WebP)
+- 🌓 **Dark/Light Mode** - Automatic theme support
+
+### Advanced Features
+- 🔍 **Advanced Search** - Search across all conversations and messages
+- 📤 **Export Conversations** - Export to PDF or Markdown format
+- 🎯 **Custom System Prompts** - Pre-configured prompts for different use cases:
+  - Default Assistant
+  - Code Expert (web dev, backend, databases)
+  - Data Analyst (sports data, statistics)
+  - Product Manager
+  - Technical Writer
+  - DevOps Engineer
+- 🎨 **Code Syntax Highlighting** - Automatic highlighting for:
+  - Swift, Python, JavaScript/TypeScript
+  - SQL, JSON
+  - And more
+- 💾 **Local Persistence** - All conversations saved locally
 
 ## Tech Stack
 
@@ -29,15 +45,22 @@ LivesportClaude/
 │   ├── Models/
 │   │   ├── Conversation.swift
 │   │   ├── Message.swift
-│   │   └── ClaudeModel.swift
+│   │   ├── ClaudeModel.swift
+│   │   └── SystemPrompt.swift
 │   ├── Services/
 │   │   ├── ClaudeAPIClient.swift
-│   │   └── ConversationStorage.swift
+│   │   ├── ConversationStorage.swift
+│   │   ├── SystemPromptStorage.swift
+│   │   ├── SearchService.swift
+│   │   └── ExportService.swift
 │   ├── Views/
 │   │   ├── ContentView.swift
 │   │   ├── ChatView.swift
 │   │   ├── ConversationListView.swift
 │   │   ├── MessageBubbleView.swift
+│   │   ├── CodeBlockView.swift
+│   │   ├── SearchView.swift
+│   │   ├── SystemPromptsView.swift
 │   │   └── SettingsView.swift
 │   ├── Resources/
 │   │   └── Assets.xcassets
@@ -64,15 +87,21 @@ LivesportClaude/
 xcodebuild -scheme LivesportClaude -configuration Release
 ```
 
-## Roadmap
+## Feature Status
 
-- [x] Basic chat interface
-- [x] Multiple conversations
-- [x] File attachments
+### Completed ✅
+- [x] Basic chat interface with streaming responses
+- [x] Multiple conversations with persistent history
+- [x] File attachments (images)
+- [x] Advanced conversation search
+- [x] Export conversations (PDF & Markdown)
+- [x] Custom system prompts with presets
+- [x] Code syntax highlighting
+- [x] Dark/Light mode support
+
+### Planned 🚧
 - [ ] Individual API keys per employee
-- [ ] Advanced conversation search
-- [ ] Export conversations
-- [ ] Custom system prompts
+- [ ] Conversation sharing between employees
 
 ## License
 

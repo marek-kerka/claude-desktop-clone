@@ -159,13 +159,42 @@ Projekt je strukturovaný do logických částí:
 - Komentujte složitý kód
 - Udržujte views malé a znovupoužitelné
 
-## Další kroky
+## Pokročilé funkce
+
+### Export konverzací
+1. Otevřete konverzaci
+2. Klikněte na ikonu exportu (↑) v záhlaví
+3. Vyberte formát (PDF nebo Markdown)
+4. Uložte soubor
+
+### Vyhledávání
+1. Klikněte na ikonu lupy (🔍) v toolbaru
+2. Zadejte hledaný text
+3. Výsledky se zobrazí v reálném čase
+4. Klikněte na výsledek pro přechod na konverzaci
+
+### System Prompts
+1. Otevřete Settings (⚙️)
+2. Přejděte na tab "System Prompts"
+3. Vyberte přednastavený prompt nebo vytvořte vlastní
+4. Vybraný prompt se použije pro všechny nové konverzace
+
+Dostupné presety:
+- **Default Assistant** - Obecný asistent
+- **Code Expert** - Pro programování a vývoj
+- **Data Analyst** - Pro analýzu dat a statistiky
+- **Product Manager** - Pro produktový management
+- **Technical Writer** - Pro psaní dokumentace
+- **DevOps Engineer** - Pro infrastrukturu a deployment
+
+### Code Highlighting
+- Automaticky detekuje code bloky v odpovědích
+- Podporuje Swift, Python, JavaScript, TypeScript, SQL, JSON
+- Copy tlačítko pro rychlé kopírování kódu
+
+## Další kroky (budoucnost)
 
 - [ ] Individuální API klíče pro zaměstnance
-- [ ] Export konverzací do PDF/Markdown
-- [ ] Pokročilé vyhledávání v konverzacích
-- [ ] Custom system prompts pro různé use cases
-- [ ] Code highlighting v odpovědích
 - [ ] Sdílení konverzací mezi zaměstnanci
 
 ## Podpora
