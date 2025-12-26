@@ -5,22 +5,22 @@
 
 import Foundation
 
-struct Message: Identifiable, Codable, Equatable {
+struct Message: Identifiable, Codable, Equatable, Hashable {
     let id: UUID
     let role: Role
     let content: [ContentBlock]
     let timestamp: Date
 
-    enum Role: String, Codable {
+    enum Role: String, Codable, Hashable {
         case user
         case assistant
     }
 
-    enum ContentBlock: Codable, Equatable {
+    enum ContentBlock: Codable, Equatable, Hashable {
         case text(String)
         case image(ImageContent)
 
-        struct ImageContent: Codable, Equatable {
+        struct ImageContent: Codable, Equatable, Hashable {
             let data: Data
             let mediaType: String
         }
