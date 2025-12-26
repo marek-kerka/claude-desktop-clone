@@ -8,6 +8,13 @@ import XCTest
 
 final class ModelPricingTests: XCTestCase {
 
+    func testHaikuPricing() {
+        let pricing = ModelPricing.pricing[ClaudeModel.haiku.rawValue]
+        XCTAssertNotNil(pricing)
+        XCTAssertEqual(pricing?.inputPricePerMillionTokens, 0.25)
+        XCTAssertEqual(pricing?.outputPricePerMillionTokens, 1.25)
+    }
+
     func testSonnetPricing() {
         let pricing = ModelPricing.pricing[ClaudeModel.sonnet.rawValue]
         XCTAssertNotNil(pricing)
