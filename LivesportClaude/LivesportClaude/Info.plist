@@ -24,5 +24,11 @@
     <string>NSApplication</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright © 2024 Livesport. All rights reserved.</string>
+    <key>SUFeedURL</key>
+    <string>https://drive.google.com/uc?export=download&amp;id=REPLACE_WITH_YOUR_APPCAST_FILE_ID</string>
+    <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUScheduledCheckInterval</key>
+    <integer>86400</integer>
 </dict>
 </plist>

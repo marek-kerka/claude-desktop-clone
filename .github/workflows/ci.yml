@@ -320,6 +320,63 @@ jobs:
         cat checksums.txt
         echo "✅ Checksums generated"
 
+    - name: Generate Appcast XML
+      run: |
+        APP_NAME="LivesportClaude"
+        VERSION="1.0.0"
+        DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+        DMG_SIZE=$(stat -f%z "dist/${DMG_NAME}")
+        CURRENT_DATE=$(date -u +"%a, %d %b %Y %H:%M:%S %z")
+
+        cat > dist/appcast.xml << 'APPCAST_EOF'
+        <?xml version="1.0" encoding="utf-8"?>
+        <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+          <channel>
+            <title>LivesportClaude Changelog</title>
+            <link>https://github.com/marek-kerka/claude-desktop-clone</link>
+            <description>Most recent updates to LivesportClaude</description>
+            <language>en</language>
+            <item>
+              <title>Version VERSION_PLACEHOLDER</title>
+              <description><![CDATA[
+                <h2>LivesportClaude VERSION_PLACEHOLDER</h2>
+                <h3>New Features</h3>
+                <ul>
+                  <li>Auto-update support with Sparkle</li>
+                  <li>Enhanced Dock Menu with cost tracking</li>
+                  <li>Conversation Tags/Categories system</li>
+                  <li>Stats Dashboard with charts</li>
+                  <li>Prompt Templates/Snippets</li>
+                </ul>
+                <h3>Improvements</h3>
+                <ul>
+                  <li>Dark mode support</li>
+                  <li>Cost tracking for cached tokens</li>
+                  <li>Code block syntax highlighting</li>
+                </ul>
+              ]]></description>
+              <pubDate>DATE_PLACEHOLDER</pubDate>
+              <sparkle:version>VERSION_PLACEHOLDER</sparkle:version>
+              <sparkle:shortVersionString>VERSION_PLACEHOLDER</sparkle:shortVersionString>
+              <enclosure
+                url="REPLACE_WITH_YOUR_GOOGLE_DRIVE_DMG_DIRECT_DOWNLOAD_URL"
+                length="SIZE_PLACEHOLDER"
+                type="application/octet-stream"
+                sparkle:edSignature="SIGNATURE_PLACEHOLDER" />
+              <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            </item>
+          </channel>
+        </rss>
+        APPCAST_EOF
+
+        # Replace placeholders
+        sed -i '' "s/VERSION_PLACEHOLDER/${VERSION}/g" dist/appcast.xml
+        sed -i '' "s/DATE_PLACEHOLDER/${CURRENT_DATE}/g" dist/appcast.xml
+        sed -i '' "s/SIZE_PLACEHOLDER/${DMG_SIZE}/g" dist/appcast.xml
+
+        echo "✅ Appcast XML generated"
+        cat dist/appcast.xml
+
     - name: Upload .app Bundle
       uses: actions/upload-artifact@v4
       with:
@@ -343,6 +400,12 @@ jobs:
       with:
         name: checksums
         path: dist/checksums.txt
+
+    - name: Upload Appcast XML
+      uses: actions/upload-artifact@v4
+      with:
+        name: appcast
+        path: dist/appcast.xml
 
     - name: Create Release Summary
       run: |

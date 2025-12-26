@@ -9,6 +9,7 @@ import SwiftUI
 struct LivesportClaudeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
+    @StateObject private var updateChecker = UpdateChecker.shared
 
     private var currentColorScheme: ColorScheme? {
         AppearanceMode(rawValue: appearanceMode)?.colorScheme
@@ -26,6 +27,15 @@ struct LivesportClaudeApp: App {
                     // This will be handled by the ContentView
                 }
                 .keyboardShortcut("n", modifiers: .command)
+            }
+
+            CommandGroup(after: .appInfo) {
+                Button("Check for Updates...") {
+                    updateChecker.checkForUpdates()
+                }
+                .disabled(!updateChecker.canCheckForUpdates || updateChecker.updateCheckInProgress)
+
+                Divider()
             }
         }
 

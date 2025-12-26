@@ -14,11 +14,15 @@ let package = Package(
             targets: ["LivesportClaude"]
         ),
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", from: "2.6.0")
+    ],
     targets: [
         .executableTarget(
             name: "LivesportClaude",
-            dependencies: [],
+            dependencies: [
+                .product(name: "Sparkle", package: "Sparkle")
+            ],
             path: "LivesportClaude/LivesportClaude",
             exclude: ["Info.plist", "Resources/Assets.xcassets"],
             sources: [
