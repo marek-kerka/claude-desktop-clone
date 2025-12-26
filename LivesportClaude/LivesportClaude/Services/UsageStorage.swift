@@ -26,11 +26,19 @@ class UsageStorage: ObservableObject {
         saveRecords()
     }
 
-    func addRecord(model: ClaudeModel, inputTokens: Int, outputTokens: Int) {
+    func addRecord(
+        model: ClaudeModel,
+        inputTokens: Int,
+        outputTokens: Int,
+        cacheCreationTokens: Int = 0,
+        cacheReadTokens: Int = 0
+    ) {
         let record = UsageRecord(
             model: model,
             inputTokens: inputTokens,
-            outputTokens: outputTokens
+            outputTokens: outputTokens,
+            cacheCreationTokens: cacheCreationTokens,
+            cacheReadTokens: cacheReadTokens
         )
         addRecord(record)
     }

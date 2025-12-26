@@ -148,7 +148,9 @@ struct ChatView: View {
                     usageStorage.addRecord(
                         model: conversation.model,
                         inputTokens: usage.inputTokens,
-                        outputTokens: usage.outputTokens
+                        outputTokens: usage.outputTokens,
+                        cacheCreationTokens: usage.cacheCreationTokens,
+                        cacheReadTokens: usage.cacheReadTokens
                     )
                 }
 

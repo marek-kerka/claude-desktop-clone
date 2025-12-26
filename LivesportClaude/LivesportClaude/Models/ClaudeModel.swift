@@ -6,6 +6,7 @@
 import Foundation
 
 enum ClaudeModel: String, Codable, CaseIterable, Identifiable {
+    case haiku = "claude-haiku-4-5-20250815"
     case sonnet = "claude-sonnet-4-5-20250929"
     case opus = "claude-opus-4-5-20251101"
 
@@ -13,6 +14,8 @@ enum ClaudeModel: String, Codable, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
+        case .haiku:
+            return "Claude Haiku 4.5"
         case .sonnet:
             return "Claude Sonnet 4.5"
         case .opus:
@@ -22,6 +25,8 @@ enum ClaudeModel: String, Codable, CaseIterable, Identifiable {
 
     var description: String {
         switch self {
+        case .haiku:
+            return "Fast and cost-effective - great for quick tasks"
         case .sonnet:
             return "Fast and intelligent - ideal for most tasks"
         case .opus:

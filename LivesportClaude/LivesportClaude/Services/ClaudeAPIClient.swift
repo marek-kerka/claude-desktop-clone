@@ -8,6 +8,8 @@ import Foundation
 struct APIUsage {
     let inputTokens: Int
     let outputTokens: Int
+    let cacheCreationTokens: Int
+    let cacheReadTokens: Int
 }
 
 @MainActor
@@ -68,6 +70,8 @@ class ClaudeAPIClient: ObservableObject {
         var fullResponse = ""
         var inputTokens = 0
         var outputTokens = 0
+        var cacheCreationTokens = 0
+        var cacheReadTokens = 0
 
         for try await line in bytes.lines {
             // Skip empty lines
@@ -91,6 +95,8 @@ class ClaudeAPIClient: ObservableObject {
                     case "message_start":
                         if let usage = event.message?.usage {
                             inputTokens = usage.inputTokens ?? 0
+                            cacheCreationTokens = usage.cacheCreationInputTokens ?? 0
+                            cacheReadTokens = usage.cacheReadInputTokens ?? 0
                         }
                     case "content_block_delta":
                         if let delta = event.delta,
@@ -114,7 +120,12 @@ class ClaudeAPIClient: ObservableObject {
             }
         }
 
-        lastUsage = APIUsage(inputTokens: inputTokens, outputTokens: outputTokens)
+        lastUsage = APIUsage(
+            inputTokens: inputTokens,
+            outputTokens: outputTokens,
+            cacheCreationTokens: cacheCreationTokens,
+            cacheReadTokens: cacheReadTokens
+        )
         return fullResponse
     }
 
@@ -162,7 +173,12 @@ class ClaudeAPIClient: ObservableObject {
         let messageResponse = try JSONDecoder().decode(MessageResponse.self, from: data)
 
         if let usage = messageResponse.usage {
-            lastUsage = APIUsage(inputTokens: usage.inputTokens, outputTokens: usage.outputTokens)
+            lastUsage = APIUsage(
+                inputTokens: usage.inputTokens,
+                outputTokens: usage.outputTokens,
+                cacheCreationTokens: usage.cacheCreationInputTokens ?? 0,
+                cacheReadTokens: usage.cacheReadInputTokens ?? 0
+            )
         }
 
         guard let textContent = messageResponse.content.first?.text else {
@@ -194,10 +210,14 @@ extension ClaudeAPIClient {
         struct UsageData: Codable {
             let inputTokens: Int?
             let outputTokens: Int?
+            let cacheCreationInputTokens: Int?
+            let cacheReadInputTokens: Int?
 
             enum CodingKeys: String, CodingKey {
                 case inputTokens = "input_tokens"
                 case outputTokens = "output_tokens"
+                case cacheCreationInputTokens = "cache_creation_input_tokens"
+                case cacheReadInputTokens = "cache_read_input_tokens"
             }
         }
     }
@@ -224,10 +244,14 @@ extension ClaudeAPIClient {
         struct Usage: Codable {
             let inputTokens: Int
             let outputTokens: Int
+            let cacheCreationInputTokens: Int?
+            let cacheReadInputTokens: Int?
 
             enum CodingKeys: String, CodingKey {
                 case inputTokens = "input_tokens"
                 case outputTokens = "output_tokens"
+                case cacheCreationInputTokens = "cache_creation_input_tokens"
+                case cacheReadInputTokens = "cache_read_input_tokens"
             }
         }
     }

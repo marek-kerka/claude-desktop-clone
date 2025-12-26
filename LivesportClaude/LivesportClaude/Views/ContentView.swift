@@ -102,6 +102,7 @@ struct WelcomeView: View {
             }
 
             VStack(alignment: .leading, spacing: 12) {
+                FeatureRow(icon: "hare", title: "Claude Haiku 4.5", description: "Fast and cost-effective")
                 FeatureRow(icon: "cpu", title: "Claude Sonnet 4.5", description: "Fast and intelligent responses")
                 FeatureRow(icon: "brain", title: "Claude Opus 4.5", description: "Advanced reasoning capabilities")
                 FeatureRow(icon: "photo", title: "Image Support", description: "Attach and analyze images")

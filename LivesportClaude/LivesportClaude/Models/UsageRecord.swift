@@ -11,6 +11,8 @@ struct UsageRecord: Codable, Identifiable, Equatable {
     let model: String
     let inputTokens: Int
     let outputTokens: Int
+    let cacheCreationTokens: Int
+    let cacheReadTokens: Int
     let cost: Double
 
     init(
@@ -18,22 +20,28 @@ struct UsageRecord: Codable, Identifiable, Equatable {
         date: Date = Date(),
         model: ClaudeModel,
         inputTokens: Int,
-        outputTokens: Int
+        outputTokens: Int,
+        cacheCreationTokens: Int = 0,
+        cacheReadTokens: Int = 0
     ) {
         self.id = id
         self.date = date
         self.model = model.rawValue
         self.inputTokens = inputTokens
         self.outputTokens = outputTokens
+        self.cacheCreationTokens = cacheCreationTokens
+        self.cacheReadTokens = cacheReadTokens
         self.cost = ModelPricing.getCost(
             model: model,
             inputTokens: inputTokens,
-            outputTokens: outputTokens
+            outputTokens: outputTokens,
+            cacheCreationTokens: cacheCreationTokens,
+            cacheReadTokens: cacheReadTokens
         )
     }
 
     var totalTokens: Int {
-        inputTokens + outputTokens
+        inputTokens + outputTokens + cacheCreationTokens + cacheReadTokens
     }
 }
 
@@ -52,8 +60,16 @@ struct UsageStatistics {
         records.reduce(0) { $0 + $1.outputTokens }
     }
 
+    var totalCacheCreationTokens: Int {
+        records.reduce(0) { $0 + $1.cacheCreationTokens }
+    }
+
+    var totalCacheReadTokens: Int {
+        records.reduce(0) { $0 + $1.cacheReadTokens }
+    }
+
     var totalTokens: Int {
-        totalInputTokens + totalOutputTokens
+        totalInputTokens + totalOutputTokens + totalCacheCreationTokens + totalCacheReadTokens
     }
 
     func filterByDateRange(from startDate: Date, to endDate: Date) -> UsageStatistics {

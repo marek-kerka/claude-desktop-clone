@@ -311,6 +311,22 @@ struct StatisticsPeriodCard: View {
                     value: "\(stats.totalOutputTokens)"
                 )
             }
+
+            if stats.totalCacheCreationTokens > 0 || stats.totalCacheReadTokens > 0 {
+                HStack {
+                    StatisticItem(
+                        label: "Cache Write",
+                        value: "\(stats.totalCacheCreationTokens)"
+                    )
+
+                    Spacer()
+
+                    StatisticItem(
+                        label: "Cache Read",
+                        value: "\(stats.totalCacheReadTokens)"
+                    )
+                }
+            }
         }
         .padding()
         .background(Color(nsColor: .controlBackgroundColor))
