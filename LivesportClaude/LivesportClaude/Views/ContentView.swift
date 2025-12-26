@@ -75,6 +75,17 @@ struct ContentView: View {
                 selectedConversation: $selectedConversation
             )
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("SwitchToConversation"))) { notification in
+            if let conversationId = notification.userInfo?["conversationId"] as? UUID {
+                switchToConversation(id: conversationId)
+            }
+        }
+    }
+
+    private func switchToConversation(id: UUID) {
+        if let conversation = storage.conversations.first(where: { $0.id == id }) {
+            selectedConversation = conversation
+        }
     }
 
     private func toggleSidebar() {

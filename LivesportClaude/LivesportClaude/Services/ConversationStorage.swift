@@ -7,6 +7,8 @@ import Foundation
 
 @MainActor
 class ConversationStorage: ObservableObject {
+    static let shared = ConversationStorage()
+
     @Published var conversations: [Conversation] = []
 
     private let fileManager = FileManager.default

@@ -8,6 +8,8 @@ import Combine
 
 @MainActor
 class UsageStorage: ObservableObject {
+    static let shared = UsageStorage()
+
     @Published private(set) var records: [UsageRecord] = []
 
     private let storageKey = "usageRecords"
