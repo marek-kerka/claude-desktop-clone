@@ -40,9 +40,9 @@ struct SettingsView: View {
                 }
                 .tag(2)
 
-            UsageStatisticsView(usageStorage: usageStorage)
+            StatsChartView(usageStorage: usageStorage)
                 .tabItem {
-                    Label("Usage & Costs", systemImage: "chart.bar")
+                    Label("Usage & Costs", systemImage: "chart.xyaxis.line")
                 }
                 .tag(3)
 
