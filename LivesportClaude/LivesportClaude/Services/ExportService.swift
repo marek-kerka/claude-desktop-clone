@@ -125,7 +125,8 @@ class ExportService {
             .foregroundColor: NSColor.gray
         ]
 
-        let meta = "Model: \(conversation.model.displayName) | Created: \(conversation.createdAt.formatted(date: .abbreviated, time: .shortened))" as NSString
+        let createdDate = conversation.createdAt.formatted(date: .abbreviated, time: .shortened)
+        let meta = "Model: \(conversation.model.displayName) | Created: \(createdDate)" as NSString
         meta.draw(at: CGPoint(x: 50, y: yPosition), withAttributes: metaAttributes)
         yPosition -= 30
 

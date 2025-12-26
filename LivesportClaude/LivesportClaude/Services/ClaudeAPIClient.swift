@@ -171,7 +171,12 @@ extension ClaudeAPIClient {
         let role: String
         let content: [Content]
         let model: String
-        let stop_reason: String?
+        let stopReason: String?
+
+        enum CodingKeys: String, CodingKey {
+            case id, type, role, content, model
+            case stopReason = "stop_reason"
+        }
 
         struct Content: Codable {
             let type: String

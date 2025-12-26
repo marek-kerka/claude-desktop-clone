@@ -45,7 +45,8 @@ struct MessageContentView: View {
                 if isInCodeBlock {
                     // End of code block
                     if !currentCode.isEmpty {
-                        elements.append(.code(CodeBlock(language: currentLanguage, code: currentCode.trimmingCharacters(in: .newlines))))
+                        let trimmedCode = currentCode.trimmingCharacters(in: .newlines)
+                        elements.append(.code(CodeBlock(language: currentLanguage, code: trimmedCode)))
                     }
                     currentCode = ""
                     currentLanguage = ""
@@ -75,7 +76,8 @@ struct MessageContentView: View {
 
         // Handle unclosed code block
         if isInCodeBlock && !currentCode.isEmpty {
-            elements.append(.code(CodeBlock(language: currentLanguage, code: currentCode.trimmingCharacters(in: .newlines))))
+            let trimmedCode = currentCode.trimmingCharacters(in: .newlines)
+            elements.append(.code(CodeBlock(language: currentLanguage, code: trimmedCode)))
         }
 
         return elements

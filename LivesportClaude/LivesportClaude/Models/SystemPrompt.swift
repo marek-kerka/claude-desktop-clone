@@ -44,7 +44,8 @@ struct SystemPrompt: Identifiable, Codable {
             - Database optimization (PostgreSQL, MongoDB, Redis)
             - Sports data and live scoring systems
 
-            Provide code examples, best practices, and architectural guidance. Always consider performance and scalability.
+            Provide code examples, best practices, and architectural guidance.
+            Always consider performance and scalability.
             """,
             isDefault: false
         ),
@@ -83,7 +84,8 @@ struct SystemPrompt: Identifiable, Codable {
             - Architecture diagrams and explanations
             - Code comments and README files
 
-            Write clear, concise, and well-structured documentation that serves both technical and non-technical audiences.
+            Write clear, concise, and well-structured documentation that serves both
+            technical and non-technical audiences.
             """,
             isDefault: false
         ),

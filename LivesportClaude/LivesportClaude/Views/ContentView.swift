@@ -99,7 +99,11 @@ struct WelcomeView: View {
                 FeatureRow(icon: "cpu", title: "Claude Sonnet 4.5", description: "Fast and intelligent responses")
                 FeatureRow(icon: "brain", title: "Claude Opus 4.5", description: "Advanced reasoning capabilities")
                 FeatureRow(icon: "photo", title: "Image Support", description: "Attach and analyze images")
-                FeatureRow(icon: "bubble.left.and.bubble.right", title: "Conversation History", description: "All your chats saved locally")
+                FeatureRow(
+                    icon: "bubble.left.and.bubble.right",
+                    title: "Conversation History",
+                    description: "All your chats saved locally"
+                )
             }
             .padding()
             .background(Color(nsColor: .controlBackgroundColor))

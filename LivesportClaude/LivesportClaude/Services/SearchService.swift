@@ -71,8 +71,11 @@ class SearchService: ObservableObject {
             return query
         }
 
-        let start = max(range.lowerBound, text.index(range.lowerBound, offsetBy: -20, limitedBy: text.startIndex) ?? text.startIndex)
-        let end = min(range.upperBound, text.index(range.upperBound, offsetBy: 20, limitedBy: text.endIndex) ?? text.endIndex)
+        let startOffset = text.index(range.lowerBound, offsetBy: -20, limitedBy: text.startIndex)
+        let start = max(range.lowerBound, startOffset ?? text.startIndex)
+
+        let endOffset = text.index(range.upperBound, offsetBy: 20, limitedBy: text.endIndex)
+        let end = min(range.upperBound, endOffset ?? text.endIndex)
 
         var match = String(text[start..<end])
         if start > text.startIndex {

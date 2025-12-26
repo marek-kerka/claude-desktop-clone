@@ -54,10 +54,11 @@ struct GeneralSettingsView: View {
                         .font(.headline)
 
                     HStack {
-                        Image(systemName: AppConfiguration.claudeAPIKey.contains("YOUR_") ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
-                            .foregroundColor(AppConfiguration.claudeAPIKey.contains("YOUR_") ? .orange : .green)
+                        let isConfigured = !AppConfiguration.claudeAPIKey.contains("YOUR_")
+                        Image(systemName: isConfigured ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
+                            .foregroundColor(isConfigured ? .green : .orange)
 
-                        Text(AppConfiguration.claudeAPIKey.contains("YOUR_") ? "Not configured" : "Configured")
+                        Text(isConfigured ? "Configured" : "Not configured")
                             .foregroundColor(.secondary)
                     }
 

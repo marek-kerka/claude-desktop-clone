@@ -56,33 +56,38 @@ extension Message {
     struct APIMessage: Codable {
         let role: String
         let content: [APIContent]
+    }
 
-        struct APIContent: Codable {
-            let type: String
-            let text: String?
-            let source: ImageSource?
+    struct APIContent: Codable {
+        let type: String
+        let text: String?
+        let source: APIImageSource?
+    }
 
-            struct ImageSource: Codable {
-                let type: String
-                let media_type: String
-                let data: String
-            }
+    struct APIImageSource: Codable {
+        let type: String
+        let mediaType: String
+        let data: String
+
+        enum CodingKeys: String, CodingKey {
+            case type, data
+            case mediaType = "media_type"
         }
     }
 
     func toAPIMessage() -> APIMessage {
-        let apiContent = content.map { block -> APIMessage.APIContent in
+        let apiContent = content.map { block -> APIContent in
             switch block {
             case .text(let text):
-                return APIMessage.APIContent(type: "text", text: text, source: nil)
+                return APIContent(type: "text", text: text, source: nil)
             case .image(let imageContent):
                 let base64Data = imageContent.data.base64EncodedString()
-                let source = APIMessage.APIContent.ImageSource(
+                let source = APIImageSource(
                     type: "base64",
-                    media_type: imageContent.mediaType,
+                    mediaType: imageContent.mediaType,
                     data: base64Data
                 )
-                return APIMessage.APIContent(type: "image", text: nil, source: source)
+                return APIContent(type: "image", text: nil, source: source)
             }
         }
         return APIMessage(role: role.rawValue, content: apiContent)
