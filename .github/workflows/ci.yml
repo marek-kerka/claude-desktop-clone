@@ -197,6 +197,167 @@ jobs:
         name: build-artifacts
         path: LivesportClaude/build/
 
+  package:
+    name: Create Distribution Packages
+    runs-on: macos-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/claude/')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
+    - name: Build Release Binary
+      run: |
+        swift build -c release
+        echo "✅ Release binary built successfully"
+
+    - name: Create .app Bundle
+      run: |
+        APP_NAME="LivesportClaude"
+        APP_BUNDLE="dist/${APP_NAME}.app"
+
+        # Create app bundle structure
+        mkdir -p "${APP_BUNDLE}/Contents/MacOS"
+        mkdir -p "${APP_BUNDLE}/Contents/Resources"
+
+        # Copy binary
+        cp .build/release/LivesportClaude "${APP_BUNDLE}/Contents/MacOS/${APP_NAME}"
+        chmod +x "${APP_BUNDLE}/Contents/MacOS/${APP_NAME}"
+
+        # Create Info.plist
+        cat > "${APP_BUNDLE}/Contents/Info.plist" << 'EOF'
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+        <plist version="1.0">
+        <dict>
+            <key>CFBundleDevelopmentRegion</key>
+            <string>en</string>
+            <key>CFBundleExecutable</key>
+            <string>LivesportClaude</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.livesport.claude</string>
+            <key>CFBundleInfoDictionaryVersion</key>
+            <string>6.0</string>
+            <key>CFBundleName</key>
+            <string>LivesportClaude</string>
+            <key>CFBundlePackageType</key>
+            <string>APPL</string>
+            <key>CFBundleShortVersionString</key>
+            <string>1.0.0</string>
+            <key>CFBundleVersion</key>
+            <string>1</string>
+            <key>LSMinimumSystemVersion</key>
+            <string>14.0</string>
+            <key>NSPrincipalClass</key>
+            <string>NSApplication</string>
+            <key>NSHumanReadableCopyright</key>
+            <string>Copyright © 2024 Livesport. All rights reserved.</string>
+            <key>LSUIElement</key>
+            <false/>
+        </dict>
+        </plist>
+        EOF
+
+        # Copy icon if exists
+        if [ -f "LivesportClaude/LivesportClaude/Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" ]; then
+          cp "LivesportClaude/LivesportClaude/Resources/Assets.xcassets/AppIcon.appiconset/icon_512x512.png" "${APP_BUNDLE}/Contents/Resources/AppIcon.icns"
+        fi
+
+        echo "✅ .app bundle created at ${APP_BUNDLE}"
+
+    - name: Create DMG
+      run: |
+        APP_NAME="LivesportClaude"
+        VERSION="1.0.0"
+        DMG_NAME="${APP_NAME}-${VERSION}.dmg"
+
+        # Create temporary DMG directory
+        mkdir -p dist/dmg
+        cp -R "dist/${APP_NAME}.app" dist/dmg/
+
+        # Create symbolic link to Applications folder
+        ln -s /Applications dist/dmg/Applications
+
+        # Create DMG
+        hdiutil create -volname "${APP_NAME}" \
+          -srcfolder dist/dmg \
+          -ov -format UDZO \
+          "dist/${DMG_NAME}"
+
+        echo "✅ DMG created: dist/${DMG_NAME}"
+        ls -lh "dist/${DMG_NAME}"
+
+    - name: Create PKG Installer
+      run: |
+        APP_NAME="LivesportClaude"
+        VERSION="1.0.0"
+        PKG_NAME="${APP_NAME}-${VERSION}.pkg"
+
+        # Create package root
+        mkdir -p dist/pkgroot/Applications
+        cp -R "dist/${APP_NAME}.app" dist/pkgroot/Applications/
+
+        # Build package
+        pkgbuild --root dist/pkgroot \
+          --identifier "com.livesport.claude" \
+          --version "${VERSION}" \
+          --install-location "/" \
+          "dist/${PKG_NAME}"
+
+        echo "✅ PKG created: dist/${PKG_NAME}"
+        ls -lh "dist/${PKG_NAME}"
+
+    - name: Generate checksums
+      run: |
+        cd dist
+        shasum -a 256 *.dmg *.pkg > checksums.txt
+        cat checksums.txt
+        echo "✅ Checksums generated"
+
+    - name: Upload .app Bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: LivesportClaude-app
+        path: dist/LivesportClaude.app
+
+    - name: Upload DMG
+      uses: actions/upload-artifact@v4
+      with:
+        name: LivesportClaude-dmg
+        path: dist/*.dmg
+
+    - name: Upload PKG
+      uses: actions/upload-artifact@v4
+      with:
+        name: LivesportClaude-pkg
+        path: dist/*.pkg
+
+    - name: Upload Checksums
+      uses: actions/upload-artifact@v4
+      with:
+        name: checksums
+        path: dist/checksums.txt
+
+    - name: Create Release Summary
+      run: |
+        echo "## 📦 Distribution Packages Created" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Files:" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        ls -lh dist/ >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Checksums:" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        cat dist/checksums.txt >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
   lint:
     name: SwiftLint
     runs-on: macos-latest
