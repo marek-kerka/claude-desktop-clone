@@ -101,7 +101,7 @@ struct ChatView: View {
         // Add images if present
         for attachment in selectedImages {
             contentBlocks.append(.image(
-                Message.ContentBlock.ImageContent(
+                Message.ImageContent(
                     data: attachment.data,
                     mediaType: attachment.mediaType
                 )

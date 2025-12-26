@@ -173,7 +173,6 @@ class ExportService {
 
             let contentText = message.textContent as NSString
             let maxWidth: CGFloat = 495
-            let contentRect = CGRect(x: 50, y: yPosition - 200, width: maxWidth, height: 200)
             let actualSize = contentText.boundingRect(
                 with: CGSize(width: maxWidth, height: .infinity),
                 options: [.usesLineFragmentOrigin],
