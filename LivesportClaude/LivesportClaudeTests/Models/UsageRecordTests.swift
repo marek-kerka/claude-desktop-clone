@@ -39,7 +39,7 @@ final class UsageRecordTests: XCTestCase {
 
     func testUsageRecordTotalTokens() {
         let record = UsageRecord(
-            model: .haiku,
+            model: .sonnet,
             inputTokens: 1000,
             outputTokens: 2000
         )
@@ -60,7 +60,7 @@ final class UsageRecordTests: XCTestCase {
         let records = [
             UsageRecord(model: .sonnet, inputTokens: 1000, outputTokens: 500),
             UsageRecord(model: .opus, inputTokens: 2000, outputTokens: 1000),
-            UsageRecord(model: .haiku, inputTokens: 3000, outputTokens: 1500)
+            UsageRecord(model: .sonnet, inputTokens: 3000, outputTokens: 1500)
         ]
 
         let stats = UsageStatistics(records: records)
@@ -109,7 +109,7 @@ final class UsageRecordTests: XCTestCase {
             UsageRecord(
                 id: UUID(),
                 date: twoDaysAgo,
-                model: .haiku,
+                model: .sonnet,
                 inputTokens: 3000,
                 outputTokens: 1500
             )

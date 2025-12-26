@@ -23,10 +23,6 @@ struct ModelPricing {
         ClaudeModel.opus.rawValue: ModelPricing(
             inputPricePerMillionTokens: 15.0,
             outputPricePerMillionTokens: 75.0
-        ),
-        ClaudeModel.haiku.rawValue: ModelPricing(
-            inputPricePerMillionTokens: 0.25,
-            outputPricePerMillionTokens: 1.25
         )
     ]
 

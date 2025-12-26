@@ -62,7 +62,11 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView(storage: storage, promptStorage: promptStorage)
+            SettingsView(
+                storage: storage,
+                promptStorage: promptStorage,
+                usageStorage: usageStorage
+            )
         }
         .sheet(isPresented: $showingSearch) {
             SearchView(

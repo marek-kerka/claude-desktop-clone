@@ -22,12 +22,6 @@ final class ModelPricingTests: XCTestCase {
         XCTAssertEqual(pricing?.outputPricePerMillionTokens, 75.0)
     }
 
-    func testHaikuPricing() {
-        let pricing = ModelPricing.pricing[ClaudeModel.haiku.rawValue]
-        XCTAssertNotNil(pricing)
-        XCTAssertEqual(pricing?.inputPricePerMillionTokens, 0.25)
-        XCTAssertEqual(pricing?.outputPricePerMillionTokens, 1.25)
-    }
 
     func testCalculateCost() {
         let pricing = ModelPricing(
@@ -62,16 +56,6 @@ final class ModelPricingTests: XCTestCase {
         XCTAssertEqual(cost, expectedCost, accuracy: 0.0001)
     }
 
-    func testGetCostForHaiku() {
-        let cost = ModelPricing.getCost(
-            model: .haiku,
-            inputTokens: 1_000_000,
-            outputTokens: 500_000
-        )
-
-        let expectedCost = (1_000_000.0 / 1_000_000.0 * 0.25) + (500_000.0 / 1_000_000.0 * 1.25)
-        XCTAssertEqual(cost, expectedCost, accuracy: 0.0001)
-    }
 
     func testZeroTokensCost() {
         let cost = ModelPricing.getCost(

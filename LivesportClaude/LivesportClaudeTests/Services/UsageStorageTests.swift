@@ -92,7 +92,7 @@ final class UsageStorageTests: XCTestCase {
             UsageRecord(
                 id: UUID(),
                 date: now,
-                model: .haiku,
+                model: .sonnet,
                 inputTokens: 3000,
                 outputTokens: 1500
             )
