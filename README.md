@@ -80,16 +80,16 @@ For detailed setup instructions, see [SETUP.md](SETUP.md).
 
 The project includes comprehensive unit tests with 70%+ code coverage.
 
-**With Swift Package Manager (current):**
-```bash
-swift build
-swift test --enable-code-coverage
-```
-
-**With Xcode (after creating .xcodeproj):**
+**With Xcode (recommended):**
 ```bash
 cd LivesportClaude
 ./run_tests.sh
+```
+
+**With Swift Package Manager (alternative):**
+```bash
+swift build
+swift test --enable-code-coverage
 ```
 
 See [TESTING.md](TESTING.md) for detailed testing documentation.

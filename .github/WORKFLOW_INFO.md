@@ -11,14 +11,14 @@
 
 The workflow now supports **both** build systems:
 
-#### 1. Xcode Project (Preferred)
-If `LivesportClaude.xcodeproj` exists:
+#### 1. Xcode Project (Preferred) ✅
+The Xcode project `LivesportClaude.xcodeproj` is now available:
 ```bash
 xcodebuild test -project LivesportClaude.xcodeproj
 ```
 
 #### 2. Swift Package Manager (Fallback)
-If no Xcode project found:
+If Xcode is not available:
 ```bash
 swift build
 swift test --enable-code-coverage
@@ -61,39 +61,39 @@ swift test --enable-code-coverage
 
 ### Testing Locally
 
-**With Xcode Project (when created):**
+**With Xcode Project (recommended):**
 ```bash
 cd LivesportClaude
 ./run_tests.sh
 ```
 
-**With Swift Package Manager (now):**
+**With Swift Package Manager (alternative):**
 ```bash
 swift build
 swift test
 ```
 
-### Creating Xcode Project
+### Xcode Project ✅
 
-To enable full Xcode workflow:
+The Xcode project is now available and committed to the repository:
 
-1. Open Xcode on macOS
-2. File > New > Project > macOS App
-3. Import existing Swift files
-4. Add test target
-5. Commit `.xcodeproj` to repository
+- **Location:** `LivesportClaude/LivesportClaude.xcodeproj`
+- **Bundle ID:** `cz.livesport.LivesportClaude`
+- **Deployment Target:** macOS 13.0
+- **Scheme:** LivesportClaude (with code coverage enabled)
+- **Targets:** App target and test target
 
 See [SETUP.md](../SETUP.md) for detailed instructions.
 
 ### Troubleshooting
 
 **Issue:** Workflow fails on GitHub
-**Cause:** No `.xcodeproj` file
-**Solution:** Workflow will automatically use Swift Package Manager as fallback
+**Cause:** Build configuration issues
+**Solution:** Workflow will automatically fall back to Swift Package Manager if Xcode build fails
 
 **Issue:** Coverage calculation fails
-**Cause:** Coverage requires Xcode project for accurate results
-**Solution:** Create Xcode project or accept SPM coverage format
+**Cause:** Coverage reporting requires specific Xcode configuration
+**Solution:** The Xcode project is configured with code coverage enabled; verify scheme settings
 
 **Issue:** Build timeout
 **Cause:** First build on Apple Silicon may take longer
