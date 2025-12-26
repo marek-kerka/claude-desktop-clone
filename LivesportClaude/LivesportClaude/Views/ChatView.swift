@@ -181,13 +181,13 @@ struct ChatHeaderView: View {
 
             // Export menu
             Menu {
-                Button(action: { ExportService.saveMarkdownFile(conversation: conversation) }) {
+                Button(action: { ExportService.saveMarkdownFile(conversation: conversation) }, label: {
                     Label("Export as Markdown", systemImage: "doc.text")
-                }
+                })
 
-                Button(action: { ExportService.exportToPDF(conversation: conversation) }) {
+                Button(action: { ExportService.exportToPDF(conversation: conversation) }, label: {
                     Label("Export as PDF", systemImage: "doc.richtext")
-                }
+                })
             } label: {
                 Image(systemName: "square.and.arrow.up")
                     .font(.system(size: 16))

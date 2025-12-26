@@ -28,10 +28,10 @@ struct SearchView: View {
                 if !searchService.searchQuery.isEmpty {
                     Button(action: {
                         searchService.clearSearch()
-                    }) {
+                    }, label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.secondary)
-                    }
+                    })
                     .buttonStyle(.plain)
                 }
             }

@@ -19,10 +19,10 @@ struct SystemPromptsView: View {
 
                 Spacer()
 
-                Button(action: { showingNewPrompt = true }) {
+                Button(action: { showingNewPrompt = true }, label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 20))
-                }
+                })
                 .buttonStyle(.plain)
             }
             .padding()

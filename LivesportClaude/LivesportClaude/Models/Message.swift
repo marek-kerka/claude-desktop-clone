@@ -16,14 +16,14 @@ struct Message: Identifiable, Codable, Equatable, Hashable {
         case assistant
     }
 
+    struct ImageContent: Codable, Equatable, Hashable {
+        let data: Data
+        let mediaType: String
+    }
+
     enum ContentBlock: Codable, Equatable, Hashable {
         case text(String)
         case image(ImageContent)
-
-        struct ImageContent: Codable, Equatable, Hashable {
-            let data: Data
-            let mediaType: String
-        }
     }
 
     init(id: UUID = UUID(), role: Role, content: [ContentBlock], timestamp: Date = Date()) {

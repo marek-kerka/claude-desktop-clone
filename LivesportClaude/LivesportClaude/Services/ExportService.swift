@@ -94,7 +94,7 @@ class ExportService {
             kCGPDFContextTitle: conversation.title,
             kCGPDFContextAuthor: "Livesport Claude",
             kCGPDFContextCreator: "Livesport Claude Desktop"
-        ] as [CFString : Any]
+        ] as [CFString: Any]
 
         var pageSize = CGRect(x: 0, y: 0, width: 595, height: 842) // A4 size
         let pdfData = NSMutableData()

@@ -46,16 +46,16 @@ struct ContentView: View {
         .navigationTitle(AppConfiguration.appName)
         .toolbar {
             ToolbarItem(placement: .automatic) {
-                Button(action: { showingSearch = true }) {
+                Button(action: { showingSearch = true }, label: {
                     Image(systemName: "magnifyingglass")
-                }
+                })
                 .help("Search conversations")
             }
 
             ToolbarItem(placement: .automatic) {
-                Button(action: { showingSettings = true }) {
+                Button(action: { showingSettings = true }, label: {
                     Image(systemName: "gear")
-                }
+                })
                 .help("Settings")
             }
         }

@@ -7,7 +7,7 @@ import Foundation
 
 struct AppConfiguration {
     // MARK: - API Configuration
-    // TODO: Move to secure storage in future version
+    // Note: API key is currently embedded. Future versions will use secure storage.
     static let claudeAPIKey = "YOUR_ANTHROPIC_API_KEY_HERE"
 
     // MARK: - App Settings

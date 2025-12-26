@@ -82,7 +82,7 @@ class SearchService: ObservableObject {
             match = "..." + match
         }
         if end < text.endIndex {
-            match = match + "..."
+            match += "..."
         }
 
         return match
@@ -107,7 +107,7 @@ class SearchService: ObservableObject {
             context = "..." + context
         }
         if end < text.endIndex {
-            context = context + "..."
+            context += "..."
         }
 
         return context
