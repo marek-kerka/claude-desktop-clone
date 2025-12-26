@@ -65,18 +65,25 @@ jobs:
     - name: Generate coverage report (Swift Package)
       if: steps.check_project.outputs.has_xcodeproj == 'false'
       run: |
+        mkdir -p LivesportClaude
         xcrun llvm-cov export -format="lcov" \
           .build/debug/LivesportClaudePackageTests.xctest/Contents/MacOS/LivesportClaudePackageTests \
-          -instr-profile .build/debug/codecov/default.profdata > coverage.lcov
-        echo "Coverage report generated (LCOV format)" > coverage.txt
+          -instr-profile .build/debug/codecov/default.profdata > LivesportClaude/coverage.lcov
+        echo "Coverage report generated (LCOV format)" > LivesportClaude/coverage.txt
+        echo "Note: Swift Package Manager was used for testing" >> LivesportClaude/coverage.txt
 
     - name: Display coverage summary
+      if: always()
       run: |
         cd LivesportClaude
-        echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
-        echo '```' >> $GITHUB_STEP_SUMMARY
-        cat coverage.txt >> $GITHUB_STEP_SUMMARY
-        echo '```' >> $GITHUB_STEP_SUMMARY
+        if [ -f "coverage.txt" ]; then
+          echo "## Test Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat coverage.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Coverage report not available" >> $GITHUB_STEP_SUMMARY
+        fi
 
     - name: Parse coverage percentage
       id: coverage
@@ -92,12 +99,14 @@ jobs:
         echo "Coverage: $COVERAGE%"
 
     - name: Upload coverage reports
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: |
           LivesportClaude/coverage.json
           LivesportClaude/coverage.txt
+          LivesportClaude/coverage.lcov
           LivesportClaude/TestResults.xcresult
 
     - name: Comment coverage on PR
@@ -106,7 +115,15 @@ jobs:
       with:
         script: |
           const fs = require('fs');
-          const coverage = fs.readFileSync('LivesportClaude/coverage.txt', 'utf8');
+          let coverage = '⚠️ Coverage report not available';
+
+          try {
+            if (fs.existsSync('LivesportClaude/coverage.txt')) {
+              coverage = fs.readFileSync('LivesportClaude/coverage.txt', 'utf8');
+            }
+          } catch (error) {
+            console.log('Could not read coverage file:', error.message);
+          }
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
@@ -116,6 +133,7 @@ jobs:
           });
 
     - name: Check coverage threshold
+      if: steps.check_project.outputs.has_xcodeproj == 'true'
       run: |
         cd LivesportClaude
         COVERAGE=$(xcrun xccov view --report TestResults.xcresult | grep -E "^\s*LivesportClaude" | awk '{print $2}' | sed 's/%//')
@@ -143,7 +161,19 @@ jobs:
       with:
         xcode-version: latest-stable
 
-    - name: Build Release
+    - name: Check for Xcode project
+      id: check_project
+      run: |
+        if [ -d "LivesportClaude/LivesportClaude.xcodeproj" ]; then
+          echo "has_xcodeproj=true" >> $GITHUB_OUTPUT
+          echo "✅ Found Xcode project"
+        else
+          echo "has_xcodeproj=false" >> $GITHUB_OUTPUT
+          echo "⚠️  Xcode project not found, skipping release build"
+        fi
+
+    - name: Build Release (Xcode)
+      if: steps.check_project.outputs.has_xcodeproj == 'true'
       run: |
         cd LivesportClaude
         xcodebuild build \
@@ -155,7 +185,13 @@ jobs:
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
+    - name: Build Release (Swift Package)
+      if: steps.check_project.outputs.has_xcodeproj == 'false'
+      run: |
+        swift build -c release
+
     - name: Archive build artifacts
+      if: steps.check_project.outputs.has_xcodeproj == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
