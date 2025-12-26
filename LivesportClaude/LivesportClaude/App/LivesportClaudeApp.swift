@@ -8,11 +8,17 @@ import SwiftUI
 @main
 struct LivesportClaudeApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
+
+    private var currentColorScheme: ColorScheme? {
+        AppearanceMode(rawValue: appearanceMode)?.colorScheme
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .frame(minWidth: 800, minHeight: 600)
+                .preferredColorScheme(currentColorScheme)
         }
         .commands {
             CommandGroup(replacing: .newItem) {

@@ -45,9 +45,29 @@ struct GeneralSettingsView: View {
     @Binding var selectedModel: String
     @ObservedObject var storage: ConversationStorage
     @Binding var showingClearConfirmation: Bool
+    @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
 
     var body: some View {
         Form {
+            Section("Appearance") {
+                Picker("Theme", selection: $appearanceMode) {
+                    ForEach(AppearanceMode.allCases) { mode in
+                        VStack(alignment: .leading) {
+                            Text(mode.displayName)
+                            Text(mode.description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .tag(mode.rawValue)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+
+                Text("Change the appearance of the application")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
             Section("API Configuration") {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("API Key Status")
