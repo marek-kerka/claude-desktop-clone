@@ -10,13 +10,23 @@ import XCTest
 final class SystemPromptStorageTests: XCTestCase {
 
     var storage: SystemPromptStorage!
+    var testFileURL: URL!
 
     override func setUp() async throws {
         try await super.setUp()
-        storage = SystemPromptStorage()
+
+        // Use temporary directory for testing
+        let tempDir = FileManager.default.temporaryDirectory
+        testFileURL = tempDir.appendingPathComponent("test_prompts_\(UUID().uuidString).json")
+
+        storage = SystemPromptStorage(storageURL: testFileURL)
     }
 
     override func tearDown() async throws {
+        // Clean up test file
+        if FileManager.default.fileExists(atPath: testFileURL.path) {
+            try? FileManager.default.removeItem(at: testFileURL)
+        }
         storage = nil
         try await super.tearDown()
     }

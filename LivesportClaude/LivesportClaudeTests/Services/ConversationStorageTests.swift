@@ -14,11 +14,12 @@ final class ConversationStorageTests: XCTestCase {
 
     override func setUp() async throws {
         try await super.setUp()
-        storage = ConversationStorage()
 
         // Use temporary directory for testing
         let tempDir = FileManager.default.temporaryDirectory
-        testFileURL = tempDir.appendingPathComponent("test_conversations.json")
+        testFileURL = tempDir.appendingPathComponent("test_conversations_\(UUID().uuidString).json")
+
+        storage = ConversationStorage(storageURL: testFileURL)
     }
 
     override func tearDown() async throws {

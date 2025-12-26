@@ -11,7 +11,13 @@ class SystemPromptStorage: ObservableObject {
     @Published var selectedPromptId: UUID?
 
     private let fileManager = FileManager.default
+    private let customStorageURL: URL?
+
     private var storageURL: URL {
+        if let customURL = customStorageURL {
+            return customURL
+        }
+
         let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appFolder = appSupport.appendingPathComponent("LivesportClaude", isDirectory: true)
 
@@ -22,7 +28,8 @@ class SystemPromptStorage: ObservableObject {
         return appFolder.appendingPathComponent("system_prompts.json")
     }
 
-    init() {
+    init(storageURL: URL? = nil) {
+        self.customStorageURL = storageURL
         loadPrompts()
     }
 

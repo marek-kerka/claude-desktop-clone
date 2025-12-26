@@ -10,7 +10,13 @@ class ConversationStorage: ObservableObject {
     @Published var conversations: [Conversation] = []
 
     private let fileManager = FileManager.default
+    private let customStorageURL: URL?
+
     private var storageURL: URL {
+        if let customURL = customStorageURL {
+            return customURL
+        }
+
         let appSupport = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
         let appFolder = appSupport.appendingPathComponent("LivesportClaude", isDirectory: true)
 
@@ -21,7 +27,8 @@ class ConversationStorage: ObservableObject {
         return appFolder.appendingPathComponent("conversations.json")
     }
 
-    init() {
+    init(storageURL: URL? = nil) {
+        self.customStorageURL = storageURL
         loadConversations()
     }
 
