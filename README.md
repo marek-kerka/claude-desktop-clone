@@ -80,6 +80,13 @@ For detailed setup instructions, see [SETUP.md](SETUP.md).
 
 The project includes comprehensive unit tests with 70%+ code coverage.
 
+**With Swift Package Manager (current):**
+```bash
+swift build
+swift test --enable-code-coverage
+```
+
+**With Xcode (after creating .xcodeproj):**
 ```bash
 cd LivesportClaude
 ./run_tests.sh
@@ -89,10 +96,11 @@ See [TESTING.md](TESTING.md) for detailed testing documentation.
 
 ### Test Coverage
 
-- ✅ Models: 100% coverage
-- ✅ Services: 80%+ coverage
-- ✅ Automated CI/CD with GitHub Actions
-- ✅ Coverage reports on every PR
+- ✅ Models: 100% coverage target
+- ✅ Services: 80%+ coverage target
+- ✅ Automated CI/CD with GitHub Actions (Apple Silicon)
+- ✅ Dual build system support (Xcode + SPM)
+- ✅ 77 unit tests across 8 test files
 
 ## Development
 

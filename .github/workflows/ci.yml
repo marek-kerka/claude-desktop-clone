@@ -6,62 +6,69 @@ on:
   pull_request:
     branches: [ main, develop ]
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_15.0.app/Contents/Developer
-
 jobs:
   test:
     name: Run Tests
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Select Xcode version
-      run: sudo xcode-select -s /Applications/Xcode_15.0.app/Contents/Developer
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
 
     - name: Show Xcode version
       run: xcodebuild -version
 
-    - name: Show available schemes
-      run: xcodebuild -list -project LivesportClaude/LivesportClaude.xcodeproj || true
+    - name: Check for Xcode project
+      id: check_project
+      run: |
+        if [ -d "LivesportClaude/LivesportClaude.xcodeproj" ]; then
+          echo "has_xcodeproj=true" >> $GITHUB_OUTPUT
+          echo "✅ Found Xcode project"
+        else
+          echo "has_xcodeproj=false" >> $GITHUB_OUTPUT
+          echo "⚠️  Xcode project not found, will use Swift Package Manager"
+        fi
 
-    - name: Clean build folder
+    - name: Build and test (Xcode Project)
+      if: steps.check_project.outputs.has_xcodeproj == 'true'
       run: |
         cd LivesportClaude
         xcodebuild clean -project LivesportClaude.xcodeproj -scheme LivesportClaude || true
-
-    - name: Build for testing
-      run: |
-        cd LivesportClaude
-        xcodebuild build-for-testing \
+        xcodebuild test \
           -project LivesportClaude.xcodeproj \
           -scheme LivesportClaude \
           -destination 'platform=macOS' \
           -enableCodeCoverage YES \
+          -resultBundlePath TestResults \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
           CODE_SIGNING_ALLOWED=NO
 
-    - name: Run tests with coverage
+    - name: Build and test (Swift Package)
+      if: steps.check_project.outputs.has_xcodeproj == 'false'
       run: |
-        cd LivesportClaude
-        xcodebuild test-without-building \
-          -project LivesportClaude.xcodeproj \
-          -scheme LivesportClaude \
-          -destination 'platform=macOS' \
-          -enableCodeCoverage YES \
-          CODE_SIGN_IDENTITY="" \
-          CODE_SIGNING_REQUIRED=NO \
-          CODE_SIGNING_ALLOWED=NO \
-          -resultBundlePath TestResults
+        swift build
+        swift test --enable-code-coverage
 
-    - name: Generate coverage report
+    - name: Generate coverage report (Xcode)
+      if: steps.check_project.outputs.has_xcodeproj == 'true'
       run: |
         cd LivesportClaude
         xcrun xccov view --report --json TestResults.xcresult > coverage.json
         xcrun xccov view --report TestResults.xcresult > coverage.txt
+
+    - name: Generate coverage report (Swift Package)
+      if: steps.check_project.outputs.has_xcodeproj == 'false'
+      run: |
+        xcrun llvm-cov export -format="lcov" \
+          .build/debug/LivesportClaudePackageTests.xctest/Contents/MacOS/LivesportClaudePackageTests \
+          -instr-profile .build/debug/codecov/default.profdata > coverage.lcov
+        echo "Coverage report generated (LCOV format)" > coverage.txt
 
     - name: Display coverage summary
       run: |
@@ -74,8 +81,13 @@ jobs:
     - name: Parse coverage percentage
       id: coverage
       run: |
-        cd LivesportClaude
-        COVERAGE=$(xcrun xccov view --report TestResults.xcresult | grep -E "^\s*LivesportClaude" | awk '{print $2}' | sed 's/%//')
+        if [ -f "LivesportClaude/coverage.txt" ]; then
+          cd LivesportClaude
+          COVERAGE=$(xcrun xccov view --report TestResults.xcresult | grep -E "^\s*LivesportClaude" | awk '{print $2}' | sed 's/%//' || echo "0")
+        else
+          COVERAGE="0"
+          echo "⚠️  Coverage calculation skipped (Xcode project required for accurate coverage)"
+        fi
         echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
         echo "Coverage: $COVERAGE%"
 
@@ -119,15 +131,17 @@ jobs:
 
   build:
     name: Build App
-    runs-on: macos-13
+    runs-on: macos-latest
     needs: test
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Select Xcode version
-      run: sudo xcode-select -s /Applications/Xcode_15.0.app/Contents/Developer
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
 
     - name: Build Release
       run: |
@@ -149,7 +163,7 @@ jobs:
 
   lint:
     name: SwiftLint
-    runs-on: macos-13
+    runs-on: macos-latest
 
     steps:
     - name: Checkout code
