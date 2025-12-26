@@ -66,10 +66,30 @@ final class ConversationTagTests: XCTestCase {
 
     func testConversationHashableWithTags() {
         let tag = Tag(name: "Work", color: .blue)
-        let conversation1 = Conversation(id: UUID(), tags: [tag])
-        let conversation2 = Conversation(id: conversation1.id, tags: [tag])
+        let id = UUID()
+        let now = Date()
+
+        let conversation1 = Conversation(
+            id: id,
+            title: "Test",
+            messages: [],
+            createdAt: now,
+            updatedAt: now,
+            model: .sonnet,
+            tags: [tag]
+        )
+        let conversation2 = Conversation(
+            id: id,
+            title: "Test",
+            messages: [],
+            createdAt: now,
+            updatedAt: now,
+            model: .sonnet,
+            tags: [tag]
+        )
 
         XCTAssertEqual(conversation1, conversation2)
+        XCTAssertEqual(conversation1.hashValue, conversation2.hashValue)
     }
 
     func testFilterConversationsByTag() {
