@@ -91,7 +91,7 @@ final class MessageTests: XCTestCase {
         XCTAssertEqual(apiMessage.content[0].type, "text")
         XCTAssertEqual(apiMessage.content[1].type, "image")
         XCTAssertNotNil(apiMessage.content[1].source)
-        XCTAssertEqual(apiMessage.content[1].source?.media_type, "image/jpeg")
+        XCTAssertEqual(apiMessage.content[1].source?.mediaType, "image/jpeg")
     }
 
     func testContentBlockEquality() {
