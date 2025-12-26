@@ -68,7 +68,7 @@ final class ExportServiceTests: XCTestCase {
         let imageData = Data([0xFF, 0xD8, 0xFF])
         conv.addMessage(Message(role: .user, content: [
             .text("Check this image"),
-            .image(Message.ContentBlock.ImageContent(data: imageData, mediaType: "image/jpeg"))
+            .image(Message.ImageContent(data: imageData, mediaType: "image/jpeg"))
         ]))
 
         let markdown = ExportService.exportToMarkdown(conversation: conv)
