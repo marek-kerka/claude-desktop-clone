@@ -96,7 +96,7 @@ class ExportService {
             kCGPDFContextCreator: "Livesport Claude Desktop"
         ] as [CFString : Any]
 
-        let pageSize = CGRect(x: 0, y: 0, width: 595, height: 842) // A4 size
+        var pageSize = CGRect(x: 0, y: 0, width: 595, height: 842) // A4 size
         let pdfData = NSMutableData()
 
         guard let pdfConsumer = CGDataConsumer(data: pdfData),
@@ -107,7 +107,7 @@ class ExportService {
         // Header info
         var yPosition: CGFloat = 792 // Start from top
 
-        pdfContext.beginPage(mediaBox: &pageSize.size)
+        pdfContext.beginPage(mediaBox: &pageSize)
 
         // Draw header
         let headerAttributes: [NSAttributedString.Key: Any] = [
@@ -143,7 +143,7 @@ class ExportService {
             if yPosition < 100 {
                 pdfContext.endPage()
                 yPosition = 792
-                pdfContext.beginPage(mediaBox: &pageSize.size)
+                pdfContext.beginPage(mediaBox: &pageSize)
             }
 
             let roleAttributes: [NSAttributedString.Key: Any] = [
