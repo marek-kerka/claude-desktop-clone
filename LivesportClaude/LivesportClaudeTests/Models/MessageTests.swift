@@ -42,7 +42,7 @@ final class MessageTests: XCTestCase {
         let imageData = Data([0x00, 0x01, 0x02])
         let message = Message(role: .user, content: [
             .text("Text content"),
-            .image(Message.ContentBlock.ImageContent(data: imageData, mediaType: "image/png"))
+            .image(Message.ImageContent(data: imageData, mediaType: "image/png"))
         ])
 
         let textContent = message.textContent
@@ -82,7 +82,7 @@ final class MessageTests: XCTestCase {
         let imageData = Data([0xFF, 0xD8, 0xFF]) // JPEG header
         let message = Message(role: .user, content: [
             .text("Check this image"),
-            .image(Message.ContentBlock.ImageContent(data: imageData, mediaType: "image/jpeg"))
+            .image(Message.ImageContent(data: imageData, mediaType: "image/jpeg"))
         ])
 
         let apiMessage = message.toAPIMessage()
@@ -108,9 +108,9 @@ final class MessageTests: XCTestCase {
         let data2 = Data([0x01, 0x02])
         let data3 = Data([0x03, 0x04])
 
-        let img1 = Message.ContentBlock.ImageContent(data: data1, mediaType: "image/png")
-        let img2 = Message.ContentBlock.ImageContent(data: data2, mediaType: "image/png")
-        let img3 = Message.ContentBlock.ImageContent(data: data3, mediaType: "image/png")
+        let img1 = Message.ImageContent(data: data1, mediaType: "image/png")
+        let img2 = Message.ImageContent(data: data2, mediaType: "image/png")
+        let img3 = Message.ImageContent(data: data3, mediaType: "image/png")
 
         XCTAssertEqual(img1, img2)
         XCTAssertNotEqual(img1, img3)
