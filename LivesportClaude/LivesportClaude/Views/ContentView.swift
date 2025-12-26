@@ -8,6 +8,7 @@ import SwiftUI
 struct ContentView: View {
     @StateObject private var storage = ConversationStorage()
     @StateObject private var promptStorage = SystemPromptStorage()
+    @StateObject private var usageStorage = UsageStorage()
     @StateObject private var searchService = SearchService()
 
     @State private var selectedConversation: Conversation?
@@ -36,7 +37,8 @@ struct ContentView: View {
                 ChatView(
                     conversation: $storage.conversations[index],
                     storage: storage,
-                    promptStorage: promptStorage
+                    promptStorage: promptStorage,
+                    usageStorage: usageStorage
                 )
                 .id(conversation.id)
             } else {

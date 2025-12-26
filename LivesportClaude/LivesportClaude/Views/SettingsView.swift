@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("selectedModel") private var selectedModel: String = ClaudeModel.sonnet.rawValue
     @ObservedObject var storage: ConversationStorage
     @ObservedObject var promptStorage: SystemPromptStorage
+    @ObservedObject var usageStorage: UsageStorage
 
     @State private var showingClearConfirmation = false
     @State private var selectedTab = 0
@@ -31,11 +32,17 @@ struct SettingsView: View {
                 }
                 .tag(1)
 
+            UsageStatisticsView(usageStorage: usageStorage)
+                .tabItem {
+                    Label("Usage & Costs", systemImage: "chart.bar")
+                }
+                .tag(2)
+
             AboutView()
                 .tabItem {
                     Label("About", systemImage: "info.circle")
                 }
-                .tag(2)
+                .tag(3)
         }
         .frame(width: 700, height: 600)
     }
@@ -197,5 +204,132 @@ struct InfoRow: View {
                 .fontWeight(.medium)
         }
         .padding(.horizontal, 100)
+    }
+}
+
+// MARK: - Usage Statistics View
+
+struct UsageStatisticsView: View {
+    @ObservedObject var usageStorage: UsageStorage
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Usage & Cost Statistics")
+                .font(.title2)
+                .fontWeight(.semibold)
+                .padding(.top)
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    StatisticsPeriodCard(
+                        title: "Today",
+                        stats: usageStorage.statistics.today
+                    )
+
+                    StatisticsPeriodCard(
+                        title: "This Week",
+                        stats: usageStorage.statistics.thisWeek
+                    )
+
+                    StatisticsPeriodCard(
+                        title: "This Month",
+                        stats: usageStorage.statistics.thisMonth
+                    )
+
+                    StatisticsPeriodCard(
+                        title: "All Time",
+                        stats: usageStorage.statistics
+                    )
+                }
+                .padding()
+            }
+
+            Divider()
+
+            HStack {
+                Text("\(usageStorage.records.count) total API calls")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+
+                Spacer()
+
+                Button("Clear All Data", role: .destructive) {
+                    usageStorage.deleteAllRecords()
+                }
+                .disabled(usageStorage.records.isEmpty)
+            }
+            .padding()
+        }
+    }
+}
+
+struct StatisticsPeriodCard: View {
+    let title: String
+    let stats: UsageStatistics
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            Divider()
+
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Total Cost")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text(String(format: "$%.4f", stats.totalCost))
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.green)
+                }
+
+                Spacer()
+
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text("Total Tokens")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(stats.totalTokens)")
+                        .font(.title3)
+                        .fontWeight(.semibold)
+                }
+            }
+
+            HStack {
+                StatisticItem(
+                    label: "Input Tokens",
+                    value: "\(stats.totalInputTokens)"
+                )
+
+                Spacer()
+
+                StatisticItem(
+                    label: "Output Tokens",
+                    value: "\(stats.totalOutputTokens)"
+                )
+            }
+        }
+        .padding()
+        .background(Color(nsColor: .controlBackgroundColor))
+        .cornerRadius(8)
+    }
+}
+
+struct StatisticItem: View {
+    let label: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(label)
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            Text(value)
+                .font(.callout)
+                .fontWeight(.medium)
+        }
     }
 }

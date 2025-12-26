@@ -11,16 +11,23 @@ struct ChatView: View {
     @StateObject private var apiClient: ClaudeAPIClient
     @ObservedObject var storage: ConversationStorage
     @ObservedObject var promptStorage: SystemPromptStorage
+    @ObservedObject var usageStorage: UsageStorage
 
     @State private var inputText = ""
     @State private var isStreaming = false
     @State private var streamingResponse = ""
     @State private var selectedImages: [ImageAttachment] = []
 
-    init(conversation: Binding<Conversation>, storage: ConversationStorage, promptStorage: SystemPromptStorage) {
+    init(
+        conversation: Binding<Conversation>,
+        storage: ConversationStorage,
+        promptStorage: SystemPromptStorage,
+        usageStorage: UsageStorage
+    ) {
         self._conversation = conversation
         self.storage = storage
         self.promptStorage = promptStorage
+        self.usageStorage = usageStorage
         self._apiClient = StateObject(wrappedValue: ClaudeAPIClient(apiKey: AppConfiguration.claudeAPIKey))
     }
 
@@ -135,6 +142,15 @@ struct ChatView: View {
                 let assistantMessage = Message(role: .assistant, text: response)
                 conversation.addMessage(assistantMessage)
                 storage.updateConversation(conversation)
+
+                // Track usage
+                if let usage = apiClient.lastUsage {
+                    usageStorage.addRecord(
+                        model: conversation.model,
+                        inputTokens: usage.inputTokens,
+                        outputTokens: usage.outputTokens
+                    )
+                }
 
                 streamingResponse = ""
                 isStreaming = false

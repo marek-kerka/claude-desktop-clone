@@ -5,6 +5,11 @@
 
 import Foundation
 
+struct APIUsage {
+    let inputTokens: Int
+    let outputTokens: Int
+}
+
 @MainActor
 class ClaudeAPIClient: ObservableObject {
     private let apiKey: String
@@ -13,6 +18,7 @@ class ClaudeAPIClient: ObservableObject {
 
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var lastUsage: APIUsage?
 
     init(apiKey: String) {
         self.apiKey = apiKey
@@ -60,6 +66,8 @@ class ClaudeAPIClient: ObservableObject {
         }
 
         var fullResponse = ""
+        var inputTokens = 0
+        var outputTokens = 0
 
         for try await line in bytes.lines {
             // Skip empty lines
@@ -80,11 +88,19 @@ class ClaudeAPIClient: ObservableObject {
                     let event = try JSONDecoder().decode(StreamEvent.self, from: data)
 
                     switch event.type {
+                    case "message_start":
+                        if let usage = event.message?.usage {
+                            inputTokens = usage.inputTokens ?? 0
+                        }
                     case "content_block_delta":
                         if let delta = event.delta,
                            let text = delta.text {
                             fullResponse += text
                             onChunk(text)
+                        }
+                    case "message_delta":
+                        if let usage = event.usage {
+                            outputTokens = usage.outputTokens ?? 0
                         }
                     case "message_stop":
                         break
@@ -98,6 +114,7 @@ class ClaudeAPIClient: ObservableObject {
             }
         }
 
+        lastUsage = APIUsage(inputTokens: inputTokens, outputTokens: outputTokens)
         return fullResponse
     }
 
@@ -144,6 +161,10 @@ class ClaudeAPIClient: ObservableObject {
 
         let messageResponse = try JSONDecoder().decode(MessageResponse.self, from: data)
 
+        if let usage = messageResponse.usage {
+            lastUsage = APIUsage(inputTokens: usage.inputTokens, outputTokens: usage.outputTokens)
+        }
+
         guard let textContent = messageResponse.content.first?.text else {
             throw APIError.invalidResponse
         }
@@ -158,10 +179,26 @@ extension ClaudeAPIClient {
     struct StreamEvent: Codable {
         let type: String
         let delta: Delta?
+        let message: MessageData?
+        let usage: UsageData?
 
         struct Delta: Codable {
             let type: String?
             let text: String?
+        }
+
+        struct MessageData: Codable {
+            let usage: UsageData?
+        }
+
+        struct UsageData: Codable {
+            let inputTokens: Int?
+            let outputTokens: Int?
+
+            enum CodingKeys: String, CodingKey {
+                case inputTokens = "input_tokens"
+                case outputTokens = "output_tokens"
+            }
         }
     }
 
@@ -172,15 +209,26 @@ extension ClaudeAPIClient {
         let content: [Content]
         let model: String
         let stopReason: String?
+        let usage: Usage?
 
         enum CodingKeys: String, CodingKey {
-            case id, type, role, content, model
+            case id, type, role, content, model, usage
             case stopReason = "stop_reason"
         }
 
         struct Content: Codable {
             let type: String
             let text: String?
+        }
+
+        struct Usage: Codable {
+            let inputTokens: Int
+            let outputTokens: Int
+
+            enum CodingKeys: String, CodingKey {
+                case inputTokens = "input_tokens"
+                case outputTokens = "output_tokens"
+            }
         }
     }
 
