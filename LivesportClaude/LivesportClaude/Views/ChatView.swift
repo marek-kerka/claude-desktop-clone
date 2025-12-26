@@ -256,6 +256,9 @@ struct ChatInputView: View {
     let isStreaming: Bool
     let onSend: () -> Void
 
+    @StateObject private var templateStorage = PromptTemplateStorage.shared
+    @State private var showingTemplatePicker = false
+
     var body: some View {
         VStack(spacing: 8) {
             // Image attachments preview
@@ -274,6 +277,15 @@ struct ChatInputView: View {
             }
 
             HStack(alignment: .bottom, spacing: 12) {
+                // Template button
+                Button(action: { showingTemplatePicker = true }) {
+                    Image(systemName: "doc.text")
+                        .font(.system(size: 18))
+                }
+                .buttonStyle(.plain)
+                .disabled(isStreaming)
+                .help("Insert template")
+
                 // Attach button
                 Button(action: attachImage) {
                     Image(systemName: "paperclip")
@@ -281,6 +293,7 @@ struct ChatInputView: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(isStreaming)
+                .help("Attach image")
 
                 // Text input
                 TextEditor(text: $inputText)
@@ -306,6 +319,17 @@ struct ChatInputView: View {
                 .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && selectedImages.isEmpty)
             }
             .padding()
+        }
+        .sheet(isPresented: $showingTemplatePicker) {
+            PromptTemplatePicker(templateStorage: templateStorage) { template in
+                // Insert template content into text input
+                if inputText.isEmpty {
+                    inputText = template.content
+                } else {
+                    inputText += "\n\n" + template.content
+                }
+                showingTemplatePicker = false
+            }
         }
     }
 

@@ -11,6 +11,7 @@ struct SettingsView: View {
     @ObservedObject var promptStorage: SystemPromptStorage
     @ObservedObject var usageStorage: UsageStorage
     @StateObject private var tagStorage = TagStorage.shared
+    @StateObject private var templateStorage = PromptTemplateStorage.shared
 
     @State private var showingClearConfirmation = false
     @State private var selectedTab = 0
@@ -33,24 +34,30 @@ struct SettingsView: View {
                 }
                 .tag(1)
 
+            PromptTemplateManagementView(templateStorage: templateStorage)
+                .tabItem {
+                    Label("Templates", systemImage: "doc.text")
+                }
+                .tag(2)
+
             TagManagementView(tagStorage: tagStorage)
                 .padding()
                 .tabItem {
                     Label("Tags", systemImage: "tag")
                 }
-                .tag(2)
+                .tag(3)
 
             StatsChartView(usageStorage: usageStorage)
                 .tabItem {
                     Label("Usage & Costs", systemImage: "chart.xyaxis.line")
                 }
-                .tag(3)
+                .tag(4)
 
             AboutView()
                 .tabItem {
                     Label("About", systemImage: "info.circle")
                 }
-                .tag(4)
+                .tag(5)
         }
         .frame(width: 700, height: 600)
     }
