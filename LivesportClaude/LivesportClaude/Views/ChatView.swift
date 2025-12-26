@@ -179,40 +179,72 @@ struct ChatView: View {
 struct ChatHeaderView: View {
     @Binding var conversation: Conversation
     @ObservedObject var storage: ConversationStorage
+    @StateObject private var tagStorage = TagStorage.shared
+    @State private var showingTagSelector = false
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                TextField("Conversation Title", text: $conversation.title)
-                    .textFieldStyle(.plain)
-                    .font(.headline)
-                    .onChange(of: conversation.title) { _ in
-                        storage.updateConversation(conversation)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    TextField("Conversation Title", text: $conversation.title)
+                        .textFieldStyle(.plain)
+                        .font(.headline)
+                        .onChange(of: conversation.title) { _ in
+                            storage.updateConversation(conversation)
+                        }
+
+                    Text(conversation.model.displayName)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                // Tag button
+                Button(action: { showingTagSelector = true }) {
+                    Image(systemName: "tag")
+                        .font(.system(size: 16))
+                }
+                .buttonStyle(.borderless)
+                .help("Manage tags")
+
+                // Export menu
+                Menu {
+                    Button(action: { ExportService.saveMarkdownFile(conversation: conversation) }, label: {
+                        Label("Export as Markdown", systemImage: "doc.text")
+                    })
+
+                    Button(action: { ExportService.exportToPDF(conversation: conversation) }, label: {
+                        Label("Export as PDF", systemImage: "doc.richtext")
+                    })
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 16))
+                }
+                .menuStyle(.borderlessButton)
+            }
+
+            // Tags display
+            if !conversation.tags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(conversation.tags) { tag in
+                            TagChipView(tag: tag) {
+                                conversation.tags.removeAll { $0.id == tag.id }
+                                storage.updateConversation(conversation)
+                            }
+                        }
                     }
-
-                Text(conversation.model.displayName)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                }
             }
-
-            Spacer()
-
-            // Export menu
-            Menu {
-                Button(action: { ExportService.saveMarkdownFile(conversation: conversation) }, label: {
-                    Label("Export as Markdown", systemImage: "doc.text")
-                })
-
-                Button(action: { ExportService.exportToPDF(conversation: conversation) }, label: {
-                    Label("Export as PDF", systemImage: "doc.richtext")
-                })
-            } label: {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.system(size: 16))
-            }
-            .menuStyle(.borderlessButton)
         }
         .padding()
+        .sheet(isPresented: $showingTagSelector) {
+            TagSelectorView(tagStorage: tagStorage, selectedTags: $conversation.tags)
+                .onDisappear {
+                    storage.updateConversation(conversation)
+                }
+        }
     }
 }
 

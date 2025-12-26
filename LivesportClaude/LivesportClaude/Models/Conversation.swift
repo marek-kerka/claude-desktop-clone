@@ -12,6 +12,7 @@ struct Conversation: Identifiable, Codable, Hashable {
     let createdAt: Date
     var updatedAt: Date
     var model: ClaudeModel
+    var tags: [Tag]
 
     init(
         id: UUID = UUID(),
@@ -19,7 +20,8 @@ struct Conversation: Identifiable, Codable, Hashable {
         messages: [Message] = [],
         createdAt: Date = Date(),
         updatedAt: Date = Date(),
-        model: ClaudeModel = .sonnet
+        model: ClaudeModel = .sonnet,
+        tags: [Tag] = []
     ) {
         self.id = id
         self.title = title
@@ -27,6 +29,21 @@ struct Conversation: Identifiable, Codable, Hashable {
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.model = model
+        self.tags = tags
+    }
+
+    // Custom decoding to support backward compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        messages = try container.decode([Message].self, forKey: .messages)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        model = try container.decode(ClaudeModel.self, forKey: .model)
+
+        // Decode tags with default value for backward compatibility
+        tags = try container.decodeIfPresent([Tag].self, forKey: .tags) ?? []
     }
 
     var preview: String {

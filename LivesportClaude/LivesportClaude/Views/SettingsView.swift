@@ -10,6 +10,7 @@ struct SettingsView: View {
     @ObservedObject var storage: ConversationStorage
     @ObservedObject var promptStorage: SystemPromptStorage
     @ObservedObject var usageStorage: UsageStorage
+    @StateObject private var tagStorage = TagStorage.shared
 
     @State private var showingClearConfirmation = false
     @State private var selectedTab = 0
@@ -32,17 +33,24 @@ struct SettingsView: View {
                 }
                 .tag(1)
 
+            TagManagementView(tagStorage: tagStorage)
+                .padding()
+                .tabItem {
+                    Label("Tags", systemImage: "tag")
+                }
+                .tag(2)
+
             UsageStatisticsView(usageStorage: usageStorage)
                 .tabItem {
                     Label("Usage & Costs", systemImage: "chart.bar")
                 }
-                .tag(2)
+                .tag(3)
 
             AboutView()
                 .tabItem {
                     Label("About", systemImage: "info.circle")
                 }
-                .tag(3)
+                .tag(4)
         }
         .frame(width: 700, height: 600)
     }
