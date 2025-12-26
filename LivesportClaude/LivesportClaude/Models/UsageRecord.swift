@@ -40,6 +40,38 @@ struct UsageRecord: Codable, Identifiable, Equatable {
         )
     }
 
+    // Custom decoding to support backward compatibility
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        date = try container.decode(Date.self, forKey: .date)
+        model = try container.decode(String.self, forKey: .model)
+        inputTokens = try container.decode(Int.self, forKey: .inputTokens)
+        outputTokens = try container.decode(Int.self, forKey: .outputTokens)
+
+        // Decode cache tokens with default values for backward compatibility
+        cacheCreationTokens = try container.decodeIfPresent(Int.self, forKey: .cacheCreationTokens) ?? 0
+        cacheReadTokens = try container.decodeIfPresent(Int.self, forKey: .cacheReadTokens) ?? 0
+
+        // Try to decode cost, or recalculate if missing
+        if let decodedCost = try container.decodeIfPresent(Double.self, forKey: .cost) {
+            cost = decodedCost
+        } else {
+            // Recalculate cost for old records
+            guard let claudeModel = ClaudeModel(rawValue: model) else {
+                cost = 0.0
+                return
+            }
+            cost = ModelPricing.getCost(
+                model: claudeModel,
+                inputTokens: inputTokens,
+                outputTokens: outputTokens,
+                cacheCreationTokens: cacheCreationTokens,
+                cacheReadTokens: cacheReadTokens
+            )
+        }
+    }
+
     var totalTokens: Int {
         inputTokens + outputTokens + cacheCreationTokens + cacheReadTokens
     }
