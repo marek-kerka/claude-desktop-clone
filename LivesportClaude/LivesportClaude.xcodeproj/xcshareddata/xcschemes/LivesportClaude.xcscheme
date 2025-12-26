@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A1B2C3D4E5F6G7H8I9J0K1L2"
+               BlueprintIdentifier = "8CEE629FD78B4D2CBC50B723"
                BuildableName = "LivesportClaude.app"
                BlueprintName = "LivesportClaude"
                ReferencedContainer = "container:LivesportClaude.xcodeproj">
@@ -33,7 +33,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "T1E2S3T4S5T6A7R8G9E0T1T2"
+               BlueprintIdentifier = "F0A1B2C3D4E5F6A7B8C9D0E1"
                BuildableName = "LivesportClaudeTests.xctest"
                BlueprintName = "LivesportClaudeTests"
                ReferencedContainer = "container:LivesportClaude.xcodeproj">
@@ -55,7 +55,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A1B2C3D4E5F6G7H8I9J0K1L2"
+            BlueprintIdentifier = "8CEE629FD78B4D2CBC50B723"
             BuildableName = "LivesportClaude.app"
             BlueprintName = "LivesportClaude"
             ReferencedContainer = "container:LivesportClaude.xcodeproj">
@@ -72,7 +72,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A1B2C3D4E5F6G7H8I9J0K1L2"
+            BlueprintIdentifier = "8CEE629FD78B4D2CBC50B723"
             BuildableName = "LivesportClaude.app"
             BlueprintName = "LivesportClaude"
             ReferencedContainer = "container:LivesportClaude.xcodeproj">
