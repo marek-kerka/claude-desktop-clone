@@ -92,7 +92,7 @@ jobs:
         echo "Coverage: $COVERAGE%"
 
     - name: Upload coverage reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: |
@@ -156,7 +156,7 @@ jobs:
           CODE_SIGNING_ALLOWED=NO
 
     - name: Archive build artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: build-artifacts
         path: LivesportClaude/build/
