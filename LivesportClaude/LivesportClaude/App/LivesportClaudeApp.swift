@@ -24,7 +24,7 @@ struct LivesportClaudeApp: App {
         }
 
         Settings {
-            SettingsView(storage: ConversationStorage())
+            SettingsView(storage: ConversationStorage(), promptStorage: SystemPromptStorage())
         }
     }
 }
